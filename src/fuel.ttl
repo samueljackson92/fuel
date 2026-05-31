@@ -16,6 +16,7 @@
 @prefix ssn: <http://www.w3.org/ns/ssn/> .
 @prefix sosa:  <http://www.w3.org/ns/sosa/> .
 @prefix wd: <http://www.wikidata.org/entity/> .
+@prefix time: <http://www.w3.org/2006/time#> .
 @base <http://w3id.org/fuel> .
 
 <http://w3id.org/fuel> rdf:type owl:Ontology ;
@@ -154,6 +155,61 @@ fuel:detectedBy rdf:type owl:AnnotationProperty ;
 
 
 #################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.w3.org/2006/time#hasBeginning
+time:hasBeginning rdf:type owl:ObjectProperty .
+
+###  http://www.w3.org/2006/time#hasEnd
+time:hasEnd rdf:type owl:ObjectProperty .
+
+###  http://w3id.org/fuel#hasDisruptionTime
+fuel:hasDisruptionTime rdf:type owl:ObjectProperty ;
+                       rdfs:domain fuel:plasma_disruption ;
+                       rdfs:range fuel:disruption_time ;
+                       rdfs:label "has disruption time"@en ;
+                       rdfs:comment "Links a plasma disruption to the time instant marking the onset of the disruption (start of the thermal quench)."@en .
+
+###  http://w3id.org/fuel#hasThermalQuenchDuration
+fuel:hasThermalQuenchDuration rdf:type owl:ObjectProperty ;
+                              rdfs:domain fuel:thermal_quench ;
+                              rdfs:range fuel:thermal_quench_duration ;
+                              rdfs:label "has thermal quench duration"@en ;
+                              rdfs:comment "Links a thermal quench event to its characteristic duration (~1 ms)."@en .
+
+###  http://w3id.org/fuel#hasCurrentQuenchDuration
+fuel:hasCurrentQuenchDuration rdf:type owl:ObjectProperty ;
+                              rdfs:domain fuel:current_quench ;
+                              rdfs:range fuel:current_quench_duration ;
+                              rdfs:label "has current quench duration"@en ;
+                              rdfs:comment "Links a current quench event to its characteristic duration (~10–100 ms)."@en .
+
+###  http://w3id.org/fuel#hasTimeRegion
+fuel:hasTimeRegion rdf:type owl:ObjectProperty ;
+                   rdfs:domain fuel:plasma_event ;
+                   rdfs:range fuel:plasma_time_region ;
+                   rdfs:label "has time region"@en ;
+                   rdfs:comment "Links an extended plasma event to its temporal region, bounded by a minimum and maximum time instant. Applicable to events such as ELMs, sawtooth oscillations, and confinement regimes."@en .
+
+###  http://w3id.org/fuel#hasTimeMin
+fuel:hasTimeMin rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf time:hasBeginning ;
+                rdfs:domain fuel:plasma_time_region ;
+                rdfs:range time:Instant ;
+                rdfs:label "has time min"@en ;
+                rdfs:comment "The earliest time instant bounding a plasma time region, representing the onset of the event."@en .
+
+###  http://w3id.org/fuel#hasTimeMax
+fuel:hasTimeMax rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf time:hasEnd ;
+                rdfs:domain fuel:plasma_time_region ;
+                rdfs:range time:Instant ;
+                rdfs:label "has time max"@en ;
+                rdfs:comment "The latest time instant bounding a plasma time region, representing the end of the event."@en .
+
+
+#################################################################
 #    Datatypes
 #################################################################
 
@@ -193,6 +249,21 @@ wd:Q188589 rdf:type owl:Class .
 ### thermocouple Q190241
 wd:Q190241 rdf:type owl:Class .
 
+### OWL-Time external classes
+### http://www.w3.org/2006/time#TemporalEntity
+time:TemporalEntity rdf:type owl:Class .
+
+### http://www.w3.org/2006/time#Instant
+time:Instant rdf:type owl:Class ;
+             rdfs:subClassOf time:TemporalEntity .
+
+### http://www.w3.org/2006/time#Duration
+time:Duration rdf:type owl:Class ;
+              rdfs:subClassOf time:TemporalEntity .
+
+### http://www.w3.org/2006/time#Interval
+time:Interval rdf:type owl:Class ;
+              rdfs:subClassOf time:TemporalEntity .
 
 
 ###  http://w3id.org/fuel#campaign
@@ -746,6 +817,7 @@ fuel:h_to_l_transition rdf:type owl:Class ;
 
 ###  http://w3id.org/fuel#confinement_mode
 fuel:confinement_mode rdf:type owl:Class ;
+                      rdfs:subClassOf fuel:plasma_event ;
                       rdfs:label "confinement mode"@en ,
                                  "modo de confinamiento"@es ;
                       rdfs:comment "An operational regime of a magnetically confined plasma characterised by its level of energy confinement. Different confinement modes exhibit different edge transport properties, stability boundaries, and susceptibility to plasma events including ELMs and disruptions."@en ;
@@ -771,6 +843,46 @@ fuel:h_mode rdf:type owl:Class ;
             skos:altLabel "high-confinement mode"@en ,
                           "high confinement mode"@en ;
             dcterms:source <https://doi.org/10.1088/0029-5515/51/5/053018> .
+
+
+#################################################################
+#    Temporal Concepts
+#################################################################
+
+###  http://w3id.org/fuel#disruption_time
+fuel:disruption_time rdf:type owl:Class ;
+                     rdfs:subClassOf time:Instant ;
+                     rdfs:label "disruption time"@en ,
+                                "tiempo de disrupción"@es ;
+                     skos:altLabel "t_dis"@en ;
+                     rdfs:comment "The time instant marking the onset of a plasma disruption, defined as the start of the thermal quench. This is the primary reference time point for disruption event databases and prediction systems."@en ;
+                     dcterms:source <https://doi.org/10.1088/0029-5515/51/5/053018> .
+
+
+###  http://w3id.org/fuel#thermal_quench_duration
+fuel:thermal_quench_duration rdf:type owl:Class ;
+                             rdfs:subClassOf time:Duration ;
+                             rdfs:label "thermal quench duration"@en ;
+                             skos:altLabel "t_TQ"@en ;
+                             rdfs:comment "The characteristic duration of the thermal quench phase of a plasma disruption, representing the time over which the plasma thermal energy is rapidly lost. Typically on the order of 1 ms in JET-scale devices."@en ;
+                             dcterms:source <https://doi.org/10.1088/0029-5515/51/5/053018> .
+
+
+###  http://w3id.org/fuel#current_quench_duration
+fuel:current_quench_duration rdf:type owl:Class ;
+                             rdfs:subClassOf time:Duration ;
+                             rdfs:label "current quench duration"@en ;
+                             skos:altLabel "t_CQ"@en ;
+                             rdfs:comment "The characteristic duration of the current quench phase of a plasma disruption, representing the time over which the plasma current decays following the thermal quench. Typically in the range 10–100 ms in JET-scale devices. The normalised current quench time (Δt/S, where S is the plasma cross-sectional area) is used for cross-machine comparison."@en ;
+                             dcterms:source <https://doi.org/10.1088/0029-5515/51/5/053018> .
+
+
+###  http://w3id.org/fuel#plasma_time_region
+fuel:plasma_time_region rdf:type owl:Class ;
+                        rdfs:subClassOf time:Interval ;
+                        rdfs:label "plasma time region"@en ;
+                        rdfs:comment "A temporal interval associated with an extended plasma event, bounded by a minimum time instant (fuel:hasTimeMin) and a maximum time instant (fuel:hasTimeMax). Used to represent the temporal extent of events such as edge-localized modes, sawtooth oscillations, and confinement regimes. The start instant (hasTimeMin) represents the event onset; the end instant (hasTimeMax) represents the event termination."@en ;
+                        dcterms:source <https://doi.org/10.1088/0029-5515/51/5/053018> .
 
 
 #################################################################
